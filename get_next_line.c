@@ -2,6 +2,10 @@
 
 #include <stdio.h>
 #include <fcntl.h>
+#include <unistd.h>
+#include <stdlib.h>
+
+# define BUFFER_SIZE 12
 
 size_t	ft_strlen(const char *str)
 {
@@ -39,14 +43,28 @@ char	*ft_strjoin(char *s1, char *s2)
 	return (newstr);
 }
 
-char	*ft_free(char *line)
+int	ft_read(static char buf, static int i, char *line1)
 {
-	if (!line)
+	long	count;
+
+	count = 0;
+	if (buf[i] == '\0')
 	{
-		free (line);
-		return (NULL);
+		count = read(fd, buf, BUFFER_SIZE);
+		if (count <= 0)
+		{
+			if (line1[0])
+				return (1);
+			else
+			{
+				free (line1);
+				return (0);
+			}
+		}
+		buf[count] = '\0';
+		i = 0;
 	}
-	return (line);
+	return (1);
 }
 
 char	*get_next_line(int fd)
@@ -56,7 +74,7 @@ char	*get_next_line(int fd)
 	int			j;
 	char		*line1;
 	char		*line2;
-	long		count;
+	//long		count;
 	
 	// if (fd < 0 || BUFFER_SIZE <= 0)
 	// 	return (NULL);
@@ -70,20 +88,22 @@ char	*get_next_line(int fd)
 	while (buf[i] == '\0' || buf[i] != '\n')
 	{
 		//считываем новый буфер
-		if (buf[i] == '\0')
-		{
-			count = read(fd, buf, BUFFER_SIZE);
-			if (count <= 0)
-			{
-				if (line1[0])
-					return (line1);
-				else
-					free (line1);
-					return (NULL);
-			}
-			buf[count] = '\0';
-			i = 0;
-		}
+		// if (buf[i] == '\0')
+		// {
+		// 	count = read(fd, buf, BUFFER_SIZE);
+		// 	if (count <= 0)
+		// 	{
+		// 		if (line1[0])
+		// 			return (line1);
+		// 		else
+		// 			free (line1);
+		// 			return (NULL);
+		// 	}
+		// 	buf[count] = '\0';
+		// 	i = 0;
+		// }
+		if (ft_read(buf, i, line1))
+			return (line1);
 
 		///////////////////////////////////////////////////////////
 		j = 0;
